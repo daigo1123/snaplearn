@@ -40,8 +40,17 @@ const StudyMode: React.FC = () => {
   const [isFlipped, setIsFlipped] = useState(false);
   const [sessionFinished, setSessionFinished] = useState(false);
 
+  // デバッグ用のログ
+  console.log('StudyMode render:', {
+    currentIndex,
+    studyDeckLength: studyDeck.length,
+    sessionFinished,
+    isFlipped
+  });
+
   useEffect(() => {
     if (state.cards.length > 0) {
+      console.log('Setting up new study deck:', state.cards.length, 'cards');
       setStudyDeck(shuffleArray(state.cards));
       setCurrentIndex(0);
       setIsFlipped(false);
@@ -50,6 +59,13 @@ const StudyMode: React.FC = () => {
   }, [state.cards]);
 
   const handleNextCard = (knewIt: boolean) => {
+    console.log('handleNextCard called:', {
+      knewIt,
+      currentIndex,
+      studyDeckLength: studyDeck.length,
+      nextIndex: currentIndex + 1
+    });
+    
     const cardId = studyDeck[currentIndex].id;
     if (knewIt) {
       dispatch({ type: 'INCREMENT_CORRECT', payload: cardId });
@@ -58,21 +74,30 @@ const StudyMode: React.FC = () => {
     }
     
     if (currentIndex < studyDeck.length - 1) {
-      setCurrentIndex(currentIndex + 1);
+      const nextIndex = currentIndex + 1;
+      console.log('Moving to next card:', nextIndex);
+      setCurrentIndex(nextIndex);
       setIsFlipped(false);
     } else {
+      console.log('Session finished');
       setSessionFinished(true);
     }
   };
 
   const restartSession = () => {
+      console.log('Restarting session');
       setStudyDeck(shuffleArray(state.cards));
       setCurrentIndex(0);
       setIsFlipped(false);
       setSessionFinished(false);
   };
   
-  const currentCard = useMemo(() => studyDeck[currentIndex], [studyDeck, currentIndex]);
+  const currentCard = useMemo(() => {
+    const card = studyDeck[currentIndex];
+    console.log('Current card:', currentIndex, card?.front);
+    return card;
+  }, [studyDeck, currentIndex]);
+  
   const progressPercentage = studyDeck.length > 0 ? ((currentIndex + (sessionFinished ? 1 : 0)) / studyDeck.length) * 100 : 0;
 
   if (studyDeck.length === 0) {

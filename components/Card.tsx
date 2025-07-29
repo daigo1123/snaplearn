@@ -51,55 +51,108 @@ const CardComponent: React.FC<CardProps> = ({ card, onEdit, onDelete, onToggleFa
         onClick={handleFlip}
       >
         {/* Card Front */}
-        <div className="absolute w-full h-full backface-hidden flex flex-col justify-between p-4 sm:p-5 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-          <div className="flex justify-between items-start mb-2">
-            <div className="text-xs text-gray-400 dark:text-gray-500">
-              {t('addedOn')}: {formatDate(card.createdAt)}
+        <div className="absolute w-full h-full backface-hidden flex flex-col bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+          {/* Header with favorite star */}
+          <div className="flex justify-between items-center p-3 border-b border-gray-100 dark:border-gray-700">
+            <div className="text-xs text-gray-400 dark:text-gray-500 truncate">
+              {formatDate(card.createdAt)}
             </div>
             <button
               onClick={(e) => {
                 e.stopPropagation();
+                console.log('Toggling favorite for card:', card.id, 'Current favorite:', card.isFavorite);
                 onToggleFavorite(card.id);
               }}
-              className={`p-1 rounded-full transition-all duration-200 ${
+              className={`p-2 rounded-full transition-all duration-200 touch-manipulation ${
                 card.isFavorite 
-                  ? 'text-yellow-500 hover:text-yellow-600 transform scale-110' 
-                  : 'text-gray-400 hover:text-yellow-500'
+                  ? 'text-yellow-500 bg-yellow-50 dark:bg-yellow-900/30 scale-110' 
+                  : 'text-gray-400 hover:text-yellow-500 hover:bg-yellow-50 dark:hover:bg-yellow-900/30'
               }`}
               aria-label="Toggle favorite"
             >
-              <Icon name="star" className="w-4 h-4" />
+              <Icon name="star" className={`w-5 h-5 ${card.isFavorite ? 'fill-current' : ''}`} />
             </button>
           </div>
-          <p className="flex-grow flex items-center justify-center text-center text-base sm:text-lg font-medium text-gray-800 dark:text-gray-200">{card.front}</p>
-          <div className="flex justify-between items-center text-xs text-gray-400 dark:text-gray-500">
-            <div className="flex gap-3">
-              <span className="text-green-600">✓ {card.correct}</span>
-              <span className="text-red-600">✗ {card.wrong}</span>
+          
+          {/* Main content */}
+          <div className="flex-grow flex items-center justify-center p-4">
+            <p className="text-center text-lg sm:text-xl font-medium text-gray-800 dark:text-gray-200 leading-relaxed">{card.front}</p>
+          </div>
+          
+          {/* Footer with stats */}
+          <div className="flex justify-between items-center p-3 border-t border-gray-100 dark:border-gray-700">
+            <div className="flex gap-3 text-sm">
+              <span className="flex items-center gap-1 text-green-600 font-medium">
+                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                {card.correct}
+              </span>
+              <span className="flex items-center gap-1 text-red-600 font-medium">
+                <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                {card.wrong}
+              </span>
             </div>
-            <Icon name="flip" className="w-4 h-4"/>
+            <div className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500">
+              <Icon name="flip" className="w-4 h-4"/>
+              <span>Tap to flip</span>
+            </div>
           </div>
         </div>
 
         {/* Card Back */}
-        <div className="absolute w-full h-full backface-hidden rotate-y-180 flex flex-col justify-between p-4 sm:p-5 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-           <div className="absolute top-3 right-3 flex gap-1">
-            <button onClick={(e) => { e.stopPropagation(); onEdit(card); }} className="p-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 transform hover:scale-110" aria-label={t('editCard')}><Icon name="edit" className="w-4 h-4 text-gray-500" /></button>
-            <button onClick={(e) => { e.stopPropagation(); onDelete(card.id); }} className="p-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 transform hover:scale-110" aria-label={t('deleteCard')}><Icon name="delete" className="w-4 h-4 text-red-500" /></button>
-          </div>
-          <p className="flex-grow flex items-center justify-center text-center text-base sm:text-lg font-semibold text-indigo-600 dark:text-indigo-400 mt-6 sm:mt-8">{card.back}</p>
-          <div className="space-y-2">
-            <div className="flex justify-between items-center text-xs">
-              <span className="text-gray-400 dark:text-gray-500">Statistics</span>
-              {accuracy !== null && (
-                  <span className={`font-mono text-xs px-2 py-1 rounded-full transition-all duration-200 ${accuracy >= 75 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : accuracy >= 50 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}`}>
-                      {t('accuracy')}: {accuracy}%
-                  </span>
-              )}
+        <div className="absolute w-full h-full backface-hidden rotate-y-180 flex flex-col bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 cursor-pointer">
+          {/* Header with action buttons */}
+          <div className="flex justify-between items-center p-3 border-b border-gray-100 dark:border-gray-700">
+            <div className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500">
+              <Icon name="flip" className="w-4 h-4"/>
+              <span>Answer</span>
             </div>
-            <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
-              <span>{t('correctAnswers')}: {card.correct}</span>
-              <span>{t('wrongAnswers')}: {card.wrong}</span>
+            <div className="flex gap-2">
+              <button 
+                onClick={(e) => { e.stopPropagation(); onEdit(card); }} 
+                className="p-2 rounded-full bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 transition-all duration-200 touch-manipulation" 
+                aria-label={t('editCard')}
+              >
+                <Icon name="edit" className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              </button>
+              <button 
+                onClick={(e) => { e.stopPropagation(); onDelete(card.id); }} 
+                className="p-2 rounded-full bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 transition-all duration-200 touch-manipulation" 
+                aria-label={t('deleteCard')}
+              >
+                <Icon name="delete" className="w-4 h-4 text-red-600 dark:text-red-400" />
+              </button>
+            </div>
+          </div>
+          
+          {/* Main answer content */}
+          <div className="flex-grow flex items-center justify-center p-4">
+            <p className="text-center text-lg sm:text-xl font-semibold text-indigo-600 dark:text-indigo-400 leading-relaxed">{card.back}</p>
+          </div>
+          
+          {/* Statistics footer */}
+          <div className="p-3 border-t border-gray-100 dark:border-gray-700 space-y-3">
+            {accuracy !== null && (
+              <div className="text-center">
+                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                  accuracy >= 75 
+                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' 
+                    : accuracy >= 50 
+                      ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' 
+                      : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+                }`}>
+                  {t('accuracy')}: {accuracy}%
+                </span>
+              </div>
+            )}
+            <div className="flex justify-center gap-6 text-sm">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+                <span className="text-gray-600 dark:text-gray-400">{t('correctAnswers')}: {card.correct}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 bg-red-500 rounded-full"></span>
+                <span className="text-gray-600 dark:text-gray-400">{t('wrongAnswers')}: {card.wrong}</span>
+              </div>
             </div>
           </div>
         </div>
