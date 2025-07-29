@@ -1,11 +1,18 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
 
-if (!process.env.API_KEY) {
-    throw new Error("API_KEY environment variable is not set.");
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+
+console.log('GEMINI_API_KEY in service:', API_KEY ? `Present (${API_KEY.substring(0, 10)}...)` : 'Missing');
+
+if (!API_KEY || API_KEY === 'your_api_key_here') {
+    console.error('API Key check failed:', {
+        VITE_GEMINI_API_KEY: API_KEY
+    });
+    throw new Error("Gemini API key is not configured. Please set your GEMINI_API_KEY in the .env file. Get your API key from: https://makersuite.google.com/app/apikey");
 }
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const ai = new GoogleGenAI({ apiKey: API_KEY });
 
 /**
  * Extracts text from a given image using Gemini.
@@ -33,7 +40,10 @@ export const getTextFromImage = async (base64Image: string): Promise<string> => 
         return response.text;
     } catch (error) {
         console.error("Error extracting text from image:", error);
-        throw new Error("Failed to process image with Gemini API.");
+        if (error instanceof Error && error.message.includes('API key')) {
+            throw new Error("Gemini API key is not configured. Please set your GEMINI_API_KEY in the .env file.");
+        }
+        throw new Error("Failed to process image with Gemini API. Please check your API key and try again.");
     }
 };
 
