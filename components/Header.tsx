@@ -11,7 +11,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ currentView, setView, hasCards }) => {
-  const { t, language, toggleLanguage } = useLanguage();
+  const { t } = useLanguage();
   const navButtonClasses = "flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200";
   const activeClasses = "bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 shadow-sm ring-2 ring-indigo-200 dark:ring-indigo-700 scale-105";
   const inactiveClasses = "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:scale-102";
@@ -64,13 +64,6 @@ const Header: React.FC<HeaderProps> = ({ currentView, setView, hasCards }) => {
               {currentView === 'study' && (
                 <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-indigo-500 rounded-full"></div>
               )}
-            </button>
-            <button
-              onClick={toggleLanguage}
-              className={`${navButtonClasses} ${inactiveClasses} min-w-[2.5rem] sm:min-w-[3rem] justify-center px-2 sm:px-3`}
-              aria-label="Toggle language"
-            >
-              <span className="text-xs sm:text-sm">{language === 'ja' ? '🇯🇵' : '🇺🇸'}</span>
             </button>
           </nav>
         </div>

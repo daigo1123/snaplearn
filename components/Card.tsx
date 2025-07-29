@@ -60,7 +60,6 @@ const CardComponent: React.FC<CardProps> = ({ card, onEdit, onDelete, onToggleFa
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                console.log('Toggling favorite for card:', card.id, 'Current favorite:', card.isFavorite);
                 onToggleFavorite(card.id);
               }}
               className={`p-2 rounded-full transition-all duration-200 touch-manipulation ${

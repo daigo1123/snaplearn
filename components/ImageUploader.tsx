@@ -102,6 +102,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onCardsCreated }) => {
         correct: 0,
         wrong: 0,
         createdAt: Date.now(),
+        isFavorite: false,
       }));
 
       newCards.forEach(card => dispatch({ type: 'ADD_CARD', payload: card }));
