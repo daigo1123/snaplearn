@@ -1,5 +1,5 @@
 {
-  "name": "SnapLearn - OCR Flashcards",
+  "name": "CaptureLearn - OCR Flashcards",
   "description": "An application that uses OCR to extract text from your photos and converts it into study flashcards. Upload an image, generate cards, and start learning.",
   "requestFramePermissions": []
 }

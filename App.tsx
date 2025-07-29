@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { CardProvider, useCards } from './context/CardContext';
 import { ToastProvider, useToast } from './hooks/useToast';
+import { useLanguage } from './hooks/useLanguage';
 import Header from './components/Header';
 import ImageUploader from './components/ImageUploader';
 import CardList from './components/CardList';
@@ -13,6 +14,7 @@ const MainApp: React.FC = () => {
   const [view, setView] = useState<View>('list');
   const { state, dispatch } = useCards();
   const { addToast } = useToast();
+  const { t } = useLanguage();
 
   useEffect(() => {
     const loadInitialData = async () => {
@@ -47,7 +49,7 @@ const MainApp: React.FC = () => {
         {view === 'study' && <StudyMode />}
       </main>
       <footer className="text-center p-4 text-xs text-gray-500 dark:text-gray-400">
-        <p>SnapLearn - &copy; 2024. Create flashcards instantly from your photos.</p>
+        <p>{t('footerText')}</p>
       </footer>
     </div>
   );

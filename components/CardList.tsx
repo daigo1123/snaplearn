@@ -1,6 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { useCards } from '../hooks/useCards';
+import { useLanguage } from '../hooks/useLanguage';
 import { Card as CardType, View } from '../types';
 import CardComponent from './Card';
 import CardEditorModal from './CardEditorModal';
