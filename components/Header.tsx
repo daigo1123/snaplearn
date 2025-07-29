@@ -12,10 +12,10 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ currentView, setView, hasCards }) => {
   const { t, language, toggleLanguage } = useLanguage();
-  const navButtonClasses = "flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-xl transition-colors";
-  const activeClasses = "bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 shadow-sm";
-  const inactiveClasses = "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800";
-  const disabledClasses = "opacity-50 cursor-not-allowed";
+  const navButtonClasses = "flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200";
+  const activeClasses = "bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 shadow-sm ring-2 ring-indigo-200 dark:ring-indigo-700 scale-105";
+  const inactiveClasses = "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:scale-102";
+  const disabledClasses = "opacity-40 cursor-not-allowed grayscale";
 
   return (
     <header className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-md sticky top-0 z-40 shadow-lg border-b border-gray-200/50 dark:border-gray-700/50">
@@ -32,29 +32,38 @@ const Header: React.FC<HeaderProps> = ({ currentView, setView, hasCards }) => {
           <nav className="flex items-center gap-1 sm:gap-2">
             <button
               onClick={() => setView('upload')}
-              className={`${navButtonClasses} ${currentView === 'upload' ? activeClasses : inactiveClasses}`}
+              className={`${navButtonClasses} ${currentView === 'upload' ? activeClasses : inactiveClasses} relative`}
               aria-label="Upload new image"
             >
               <Icon name="upload" className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className="hidden xs:inline text-xs sm:text-sm">{t('upload')}</span>
+              {currentView === 'upload' && (
+                <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-indigo-500 rounded-full"></div>
+              )}
             </button>
             <button
               onClick={() => hasCards && setView('list')}
               disabled={!hasCards}
-              className={`${navButtonClasses} ${currentView === 'list' ? activeClasses : inactiveClasses} ${!hasCards ? disabledClasses : ''}`}
+              className={`${navButtonClasses} ${currentView === 'list' ? activeClasses : inactiveClasses} ${!hasCards ? disabledClasses : ''} relative`}
               aria-label="View all cards"
             >
               <Icon name="cards" className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className="hidden xs:inline text-xs sm:text-sm">{t('myCards')}</span>
+              {currentView === 'list' && (
+                <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-indigo-500 rounded-full"></div>
+              )}
             </button>
             <button
               onClick={() => hasCards && setView('study')}
               disabled={!hasCards}
-              className={`${navButtonClasses} ${currentView === 'study' ? activeClasses : inactiveClasses} ${!hasCards ? disabledClasses : ''}`}
+              className={`${navButtonClasses} ${currentView === 'study' ? activeClasses : inactiveClasses} ${!hasCards ? disabledClasses : ''} relative`}
               aria-label="Start study session"
             >
               <Icon name="study" className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className="hidden xs:inline text-xs sm:text-sm">{t('study')}</span>
+              {currentView === 'study' && (
+                <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-indigo-500 rounded-full"></div>
+              )}
             </button>
             <button
               onClick={toggleLanguage}

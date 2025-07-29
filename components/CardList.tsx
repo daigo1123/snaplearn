@@ -19,6 +19,7 @@ const CardList: React.FC<CardListProps> = ({ setView }) => {
   const [editingCard, setEditingCard] = useState<CardType | null>(null);
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'favorites' | string>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'date'>('grid');
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
   const filteredCards = useMemo(() => {
     let filtered = cards;
@@ -56,9 +57,13 @@ const CardList: React.FC<CardListProps> = ({ setView }) => {
     return null;
   }, [filteredCards, viewMode]);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this card?')) {
-      dispatch({ type: 'DELETE_CARD', payload: id });
+      setIsDeleting(id);
+      setTimeout(() => {
+        dispatch({ type: 'DELETE_CARD', payload: id });
+        setIsDeleting(null);
+      }, 300);
     }
   };
   
@@ -93,7 +98,12 @@ const CardList: React.FC<CardListProps> = ({ setView }) => {
   }
 
   if (state.isLoading) {
-    return <div className="text-center p-10">Loading your flashcards...</div>
+    return (
+      <div className="flex flex-col items-center justify-center p-16 space-y-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+        <p className="text-lg text-gray-600 dark:text-gray-400">Loading your flashcards...</p>
+      </div>
+    );
   }
   
   if (cards.length === 0) {
@@ -225,7 +235,14 @@ const CardList: React.FC<CardListProps> = ({ setView }) => {
       {viewMode === 'grid' ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 animate-slide-up">
           {filteredCards.map(card => (
-            <CardComponent key={card.id} card={card} onDelete={handleDelete} onEdit={handleEdit} onToggleFavorite={handleToggleFavorite} />
+            <CardComponent 
+              key={card.id} 
+              card={card} 
+              onDelete={handleDelete} 
+              onEdit={handleEdit} 
+              onToggleFavorite={handleToggleFavorite}
+              isDeleting={isDeleting === card.id}
+            />
           ))}
         </div>
       ) : (
@@ -245,7 +262,14 @@ const CardList: React.FC<CardListProps> = ({ setView }) => {
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                 {cards.map(card => (
-                  <CardComponent key={card.id} card={card} onDelete={handleDelete} onEdit={handleEdit} onToggleFavorite={handleToggleFavorite} />
+                  <CardComponent 
+                    key={card.id} 
+                    card={card} 
+                    onDelete={handleDelete} 
+                    onEdit={handleEdit} 
+                    onToggleFavorite={handleToggleFavorite}
+                    isDeleting={isDeleting === card.id}
+                  />
                 ))}
               </div>
             </div>

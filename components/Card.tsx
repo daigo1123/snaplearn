@@ -9,9 +9,10 @@ interface CardProps {
   onEdit: (card: CardType) => void;
   onDelete: (id: string) => void;
   onToggleFavorite: (id: string) => void;
+  isDeleting?: boolean;
 }
 
-const CardComponent: React.FC<CardProps> = ({ card, onEdit, onDelete, onToggleFavorite }) => {
+const CardComponent: React.FC<CardProps> = ({ card, onEdit, onDelete, onToggleFavorite, isDeleting = false }) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const { t } = useLanguage();
 
@@ -36,7 +37,15 @@ const CardComponent: React.FC<CardProps> = ({ card, onEdit, onDelete, onToggleFa
   };
 
   return (
-    <div className="w-full h-56 sm:h-64 perspective-1000">
+    <div className={`w-full h-56 sm:h-64 perspective-1000 ${isDeleting ? 'opacity-50 pointer-events-none' : ''}`}>
+      {isDeleting && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 dark:bg-gray-800/80 rounded-xl">
+          <div className="flex flex-col items-center space-y-2">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-red-600"></div>
+            <span className="text-sm text-red-600 font-medium">Deleting...</span>
+          </div>
+        </div>
+      )}
       <div
         className={`relative w-full h-full transform-style-preserve-3d transition-transform duration-700 ease-in-out ${isFlipped ? 'rotate-y-180' : ''}`}
         onClick={handleFlip}

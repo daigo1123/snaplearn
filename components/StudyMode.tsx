@@ -76,7 +76,17 @@ const StudyMode: React.FC = () => {
   const progressPercentage = studyDeck.length > 0 ? ((currentIndex + (sessionFinished ? 1 : 0)) / studyDeck.length) * 100 : 0;
 
   if (studyDeck.length === 0) {
-    return <div className="text-center p-10">{t('addCardsToStudy')}</div>;
+    return (
+      <div className="flex flex-col items-center justify-center p-16 space-y-6">
+        <div className="w-20 h-20 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+          <Icon name="cards" className="w-10 h-10 text-gray-400" />
+        </div>
+        <div className="text-center space-y-2">
+          <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300">{t('addCardsToStudy')}</h3>
+          <p className="text-gray-500 dark:text-gray-400">Create some flashcards first to start studying!</p>
+        </div>
+      </div>
+    );
   }
   
   if (sessionFinished) {
