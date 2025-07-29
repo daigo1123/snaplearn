@@ -3,6 +3,17 @@ import { GoogleGenAI, Type } from "@google/genai";
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
+// 詳細なデバッグ情報を追加
+console.log('=== GEMINI API KEY DEBUG INFO ===');
+console.log('Raw API_KEY:', API_KEY);
+console.log('API_KEY type:', typeof API_KEY);
+console.log('API_KEY length:', API_KEY ? API_KEY.length : 'undefined');
+console.log('Environment mode:', import.meta.env.MODE);
+console.log('Development mode:', import.meta.env.DEV);
+console.log('Production mode:', import.meta.env.PROD);
+console.log('All env vars:', import.meta.env);
+console.log('=== END DEBUG INFO ===');
+
 console.log('GEMINI_API_KEY in service:', API_KEY ? `Present (${API_KEY.substring(0, 10)}...)` : 'Missing');
 console.log('Environment variables check:', {
     VITE_GEMINI_API_KEY: API_KEY ? 'Present' : 'Missing',
@@ -13,11 +24,27 @@ console.log('Environment variables check:', {
 let ai: GoogleGenAI | null = null;
 
 const getAI = () => {
-    if (!API_KEY || API_KEY === 'your_api_key_here' || API_KEY === 'undefined') {
+    console.log('getAI called - API_KEY check:', {
+        hasApiKey: !!API_KEY,
+        apiKeyType: typeof API_KEY,
+        apiKeyValue: API_KEY,
+        isUndefined: API_KEY === 'undefined',
+        isDefault: API_KEY === 'your_api_key_here'
+    });
+    
+    if (!API_KEY || API_KEY === 'your_api_key_here' || API_KEY === 'undefined' || API_KEY === undefined) {
+        console.error('API Key validation failed:', {
+            API_KEY,
+            condition1: !API_KEY,
+            condition2: API_KEY === 'your_api_key_here',
+            condition3: API_KEY === 'undefined',
+            condition4: API_KEY === undefined
+        });
         throw new Error("Gemini API key is not configured. Please set your VITE_GEMINI_API_KEY in Vercel environment variables. Get your API key from: https://makersuite.google.com/app/apikey");
     }
     
     if (!ai) {
+        console.log('Initializing GoogleGenAI with API key...');
         ai = new GoogleGenAI({ apiKey: API_KEY });
     }
     
