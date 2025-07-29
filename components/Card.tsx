@@ -8,9 +8,10 @@ interface CardProps {
   card: CardType;
   onEdit: (card: CardType) => void;
   onDelete: (id: string) => void;
+  onToggleFavorite: (id: string) => void;
 }
 
-const CardComponent: React.FC<CardProps> = ({ card, onEdit, onDelete }) => {
+const CardComponent: React.FC<CardProps> = ({ card, onEdit, onDelete, onToggleFavorite }) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const { t } = useLanguage();
 
@@ -35,17 +36,33 @@ const CardComponent: React.FC<CardProps> = ({ card, onEdit, onDelete }) => {
   };
 
   return (
-    <div className="w-full h-64 perspective-1000">
+    <div className="w-full h-56 sm:h-64 perspective-1000">
       <div
         className={`relative w-full h-full transform-style-preserve-3d transition-transform duration-700 ease-in-out ${isFlipped ? 'rotate-y-180' : ''}`}
         onClick={handleFlip}
       >
         {/* Card Front */}
-        <div className="absolute w-full h-full backface-hidden flex flex-col justify-between p-5 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-xl transition-shadow">
-          <div className="text-xs text-gray-400 dark:text-gray-500 text-right mb-2">
-            {t('addedOn')}: {formatDate(card.createdAt)}
+        <div className="absolute w-full h-full backface-hidden flex flex-col justify-between p-4 sm:p-5 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+          <div className="flex justify-between items-start mb-2">
+            <div className="text-xs text-gray-400 dark:text-gray-500">
+              {t('addedOn')}: {formatDate(card.createdAt)}
+            </div>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleFavorite(card.id);
+              }}
+              className={`p-1 rounded-full transition-all duration-200 ${
+                card.isFavorite 
+                  ? 'text-yellow-500 hover:text-yellow-600 transform scale-110' 
+                  : 'text-gray-400 hover:text-yellow-500'
+              }`}
+              aria-label="Toggle favorite"
+            >
+              <Icon name="star" className="w-4 h-4" />
+            </button>
           </div>
-          <p className="flex-grow flex items-center justify-center text-center text-lg font-medium text-gray-800 dark:text-gray-200">{card.front}</p>
+          <p className="flex-grow flex items-center justify-center text-center text-base sm:text-lg font-medium text-gray-800 dark:text-gray-200">{card.front}</p>
           <div className="flex justify-between items-center text-xs text-gray-400 dark:text-gray-500">
             <div className="flex gap-3">
               <span className="text-green-600">✓ {card.correct}</span>
@@ -56,17 +73,17 @@ const CardComponent: React.FC<CardProps> = ({ card, onEdit, onDelete }) => {
         </div>
 
         {/* Card Back */}
-        <div className="absolute w-full h-full backface-hidden rotate-y-180 flex flex-col justify-between p-5 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-xl transition-shadow">
+        <div className="absolute w-full h-full backface-hidden rotate-y-180 flex flex-col justify-between p-4 sm:p-5 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-105">
            <div className="absolute top-3 right-3 flex gap-1">
-            <button onClick={() => onEdit(card)} className="p-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" aria-label={t('editCard')}><Icon name="edit" className="w-4 h-4 text-gray-500" /></button>
-            <button onClick={() => onDelete(card.id)} className="p-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" aria-label={t('deleteCard')}><Icon name="delete" className="w-4 h-4 text-red-500" /></button>
+            <button onClick={(e) => { e.stopPropagation(); onEdit(card); }} className="p-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 transform hover:scale-110" aria-label={t('editCard')}><Icon name="edit" className="w-4 h-4 text-gray-500" /></button>
+            <button onClick={(e) => { e.stopPropagation(); onDelete(card.id); }} className="p-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 transform hover:scale-110" aria-label={t('deleteCard')}><Icon name="delete" className="w-4 h-4 text-red-500" /></button>
           </div>
-          <p className="flex-grow flex items-center justify-center text-center text-lg font-semibold text-indigo-600 dark:text-indigo-400 mt-8">{card.back}</p>
+          <p className="flex-grow flex items-center justify-center text-center text-base sm:text-lg font-semibold text-indigo-600 dark:text-indigo-400 mt-6 sm:mt-8">{card.back}</p>
           <div className="space-y-2">
             <div className="flex justify-between items-center text-xs">
               <span className="text-gray-400 dark:text-gray-500">Statistics</span>
               {accuracy !== null && (
-                  <span className={`font-mono text-xs px-2 py-1 rounded-full ${accuracy >= 75 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : accuracy >= 50 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}`}>
+                  <span className={`font-mono text-xs px-2 py-1 rounded-full transition-all duration-200 ${accuracy >= 75 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : accuracy >= 50 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}`}>
                       {t('accuracy')}: {accuracy}%
                   </span>
               )}

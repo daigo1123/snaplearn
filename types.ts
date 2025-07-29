@@ -6,6 +6,15 @@ export interface Card {
   correct: number;
   wrong: number;
   createdAt: number;
+  isFavorite: boolean;
+  folderId?: string;
+}
+
+export interface Folder {
+  id: string;
+  name: string;
+  color: string;
+  createdAt: number;
 }
 
 export type View = 'upload' | 'list' | 'study';

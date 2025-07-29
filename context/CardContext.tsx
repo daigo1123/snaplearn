@@ -1,10 +1,11 @@
 
 import React, { createContext, useReducer, useContext, ReactNode, useEffect } from 'react';
-import { Card } from '../types';
+import { Card, Folder } from '../types';
 import { storageService } from '../services/storageService';
 
 interface CardState {
   cards: Card[];
+  folders: Folder[];
   isLoading: boolean;
   error: string | null;
 }
@@ -16,11 +17,18 @@ type CardAction =
   | { type: 'DELETE_CARD'; payload: string }
   | { type: 'INCREMENT_CORRECT'; payload: string }
   | { type: 'INCREMENT_WRONG'; payload: string }
+  | { type: 'TOGGLE_FAVORITE'; payload: string }
+  | { type: 'SET_FOLDERS'; payload: Folder[] }
+  | { type: 'ADD_FOLDER'; payload: Folder }
+  | { type: 'UPDATE_FOLDER'; payload: Folder }
+  | { type: 'DELETE_FOLDER'; payload: string }
+  | { type: 'MOVE_TO_FOLDER'; payload: { cardId: string; folderId?: string } }
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: string | null };
 
 const initialState: CardState = {
   cards: [],
+  folders: [],
   isLoading: true,
   error: null,
 };
@@ -55,6 +63,31 @@ const cardReducer = (state: CardState, action: CardAction): CardState => {
           ...state,
           cards: state.cards.map(c => c.id === action.payload ? {...c, wrong: c.wrong + 1} : c)
         };
+    case 'TOGGLE_FAVORITE':
+      return {
+        ...state,
+        cards: state.cards.map(c => c.id === action.payload ? {...c, isFavorite: !c.isFavorite} : c)
+      };
+    case 'SET_FOLDERS':
+      return { ...state, folders: action.payload };
+    case 'ADD_FOLDER':
+      return { ...state, folders: [...state.folders, action.payload] };
+    case 'UPDATE_FOLDER':
+      return {
+        ...state,
+        folders: state.folders.map(f => f.id === action.payload.id ? action.payload : f)
+      };
+    case 'DELETE_FOLDER':
+      return {
+        ...state,
+        folders: state.folders.filter(f => f.id !== action.payload),
+        cards: state.cards.map(c => c.folderId === action.payload ? {...c, folderId: undefined} : c)
+      };
+    case 'MOVE_TO_FOLDER':
+      return {
+        ...state,
+        cards: state.cards.map(c => c.id === action.payload.cardId ? {...c, folderId: action.payload.folderId} : c)
+      };
     default:
       return state;
   }
@@ -66,14 +99,16 @@ export const CardProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [state, dispatch] = useReducer(cardReducer, initialState);
 
   useEffect(() => {
-    // Persist state to localStorage whenever cards change
+    // Persist state to localStorage whenever cards or folders change
     if(!state.isLoading) {
         storageService.save(state.cards).catch(err => {
             console.error("Failed to save cards:", err);
-            // Optionally dispatch an error to the context
+        });
+        storageService.saveFolders(state.folders).catch(err => {
+            console.error("Failed to save folders:", err);
         });
     }
-  }, [state.cards, state.isLoading]);
+  }, [state.cards, state.folders, state.isLoading]);
 
   return (
     <CardContext.Provider value={{ state, dispatch }}>

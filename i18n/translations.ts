@@ -22,6 +22,12 @@ export const translations = {
     editCard: 'カードを編集',
     noCardsYet: 'まだカードがありません',
     addFirstCard: '最初のカードを追加しましょう',
+    favorites: 'お気に入り',
+    allCards: '全てのカード',
+    folder: 'フォルダ',
+    newFolder: '新しいフォルダ',
+    createFolder: 'フォルダを作成',
+    folderName: 'フォルダ名',
 
     // Study Mode
     progress: '進捗',
@@ -68,6 +74,12 @@ export const translations = {
     editCard: 'Edit Card',
     noCardsYet: 'No cards yet',
     addFirstCard: 'Let\'s add your first card',
+    favorites: 'Favorites',
+    allCards: 'All Cards',
+    folder: 'Folder',
+    newFolder: 'New Folder',
+    createFolder: 'Create Folder',
+    folderName: 'Folder Name',
 
     // Study Mode
     progress: 'Progress',
