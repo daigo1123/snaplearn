@@ -4,15 +4,25 @@ import { GoogleGenAI, Type } from "@google/genai";
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
 console.log('GEMINI_API_KEY in service:', API_KEY ? `Present (${API_KEY.substring(0, 10)}...)` : 'Missing');
+console.log('Environment variables check:', {
+    VITE_GEMINI_API_KEY: API_KEY ? 'Present' : 'Missing',
+    env: import.meta.env
+});
 
-if (!API_KEY || API_KEY === 'your_api_key_here') {
-    console.error('API Key check failed:', {
-        VITE_GEMINI_API_KEY: API_KEY
-    });
-    throw new Error("Gemini API key is not configured. Please set your GEMINI_API_KEY in the .env file. Get your API key from: https://makersuite.google.com/app/apikey");
-}
+// APIキーが無い場合でもアプリは起動できるように、初期化をlazy loadingにする
+let ai: GoogleGenAI | null = null;
 
-const ai = new GoogleGenAI({ apiKey: API_KEY });
+const getAI = () => {
+    if (!API_KEY || API_KEY === 'your_api_key_here' || API_KEY === 'undefined') {
+        throw new Error("Gemini API key is not configured. Please set your VITE_GEMINI_API_KEY in Vercel environment variables. Get your API key from: https://makersuite.google.com/app/apikey");
+    }
+    
+    if (!ai) {
+        ai = new GoogleGenAI({ apiKey: API_KEY });
+    }
+    
+    return ai;
+};
 
 /**
  * Extracts text from a given image using Gemini.
@@ -21,6 +31,8 @@ const ai = new GoogleGenAI({ apiKey: API_KEY });
  */
 export const getTextFromImage = async (base64Image: string): Promise<string> => {
     try {
+        const aiInstance = getAI(); // APIキーチェックはここで行う
+        
         const imagePart = {
             inlineData: {
                 mimeType: 'image/jpeg',
@@ -32,7 +44,7 @@ export const getTextFromImage = async (base64Image: string): Promise<string> => 
             text: "Extract all text from this image. Preserve the line breaks and language."
         };
 
-        const response = await ai.models.generateContent({
+        const response = await aiInstance.models.generateContent({
             model: 'gemini-2.5-flash',
             contents: { parts: [imagePart, textPart] },
         });
@@ -40,8 +52,8 @@ export const getTextFromImage = async (base64Image: string): Promise<string> => 
         return response.text;
     } catch (error) {
         console.error("Error extracting text from image:", error);
-        if (error instanceof Error && error.message.includes('API key')) {
-            throw new Error("Gemini API key is not configured. Please set your GEMINI_API_KEY in the .env file.");
+        if (error instanceof Error && (error.message.includes('API key') || error.message.includes('not configured'))) {
+            throw new Error("Gemini API key is not configured. Please check your Vercel environment variables.");
         }
         throw new Error("Failed to process image with Gemini API. Please check your API key and try again.");
     }
@@ -58,7 +70,9 @@ export const generateCardsFromText = async (text: string): Promise<Array<{ front
     }
 
     try {
-        const response = await ai.models.generateContent({
+        const aiInstance = getAI(); // APIキーチェックはここで行う
+        
+        const response = await aiInstance.models.generateContent({
             model: "gemini-2.5-flash",
             contents: `Analyze the following text and convert it into flashcards. Each flashcard should have a "front" (question/term) and a "back" (answer/definition). Intelligently identify pairs based on separators like ':', '-', or '?'. If no clear separator exists, use context to create meaningful pairs. Text to analyze:\n\n---\n${text}\n---`,
             config: {
@@ -90,6 +104,9 @@ export const generateCardsFromText = async (text: string): Promise<Array<{ front
 
     } catch (error) {
         console.error("Error generating cards from text:", error);
+        if (error instanceof Error && (error.message.includes('API key') || error.message.includes('not configured'))) {
+            throw new Error("Gemini API key is not configured. Please check your Vercel environment variables.");
+        }
         throw new Error("Failed to generate flashcards. The AI model might be unavailable or the text could not be parsed.");
     }
 };
